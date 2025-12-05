@@ -22,22 +22,22 @@ class Board():
 
     def convert_to_int(self,board):
         
-        l = [0] * 64
+        brd = [0] * 64
         #l[sq] = board.piece_type_at(sq)
         for sq in chess.scan_reversed(board.occupied_co[chess.BLACK]):  # Check if white
-            l[sq] = board.piece_type_at(sq)
+            brd[sq] = board.piece_type_at(sq)
         for sq in chess.scan_reversed(board.occupied_co[chess.WHITE]):  # Check if black
-            l[sq] = -board.piece_type_at(sq) 
+            brd[sq] = -board.piece_type_at(sq) 
         res=[]
         for i in range(1,7):
             t=[]
 
-            for obj in l:
+            for obj in brd:
                 t.append(1)if obj==i else t.append(0)
             res.append([t[x:x+8] for x in range(0, len(t), 8)])
         for i in range(-1,-7,-1):
             t=[]
-            for obj in l:
+            for obj in brd:
                 t.append(-1)if obj==i else t.append(0)
             res.append([t[x:x+8] for x in range(0, len(t), 8)])
         res.append(self.attacked_squares(board.turn))

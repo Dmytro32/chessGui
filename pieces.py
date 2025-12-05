@@ -1,5 +1,5 @@
 from tkinter import Canvas
-from abc import ABC, abstractmethod
+from abc import ABC
 
 class Pieces(ABC):
     def __init__(self,name:str,obj:Canvas):
@@ -10,8 +10,8 @@ class Pieces(ABC):
             if value==search:
                 return key
     def tran_cor(x:int):
-        l= [60,120,180,240,300,360,420,480]
-        for i in l:
+        cor= [60,120,180,240,300,360,420,480]
+        for i in cor:
             if x<i:
                 x=i-60
                 return x

@@ -2,14 +2,14 @@ import chess
 
 def convert_to_int(board):
     
-    l = [0] * 64
+    brd = [0] * 64
     #l[sq] = board.piece_type_at(sq)
     for sq in chess.scan_reversed(board.occupied_co[chess.WHITE]):  # Check if white
-        l[sq] = -board.piece_type_at(sq)
+        brd[sq] = -board.piece_type_at(sq)
     for sq in chess.scan_reversed(board.occupied_co[chess.BLACK]):  # Check if black
-        l[sq] = board.piece_type_at(sq) 
+        brd[sq] = board.piece_type_at(sq) 
    
-    return  l
+    return  brd
 mg_pawn_table =[0,   0,   0,   0,   0,   0,  0,   0, 
                 98, 134,  61,  95,  68, 126, 34, -11, 
                 -6,   7,  26,  31,  65,  56, 25, -20,
@@ -191,7 +191,7 @@ def eval(board):
         mgPhase = 24 
     egPhase = 24 - mgPhase
     res= (mgScore * mgPhase + egScore * egPhase) / 24
-    if board.turn==True:
+    if board.turn:
     
         return   res
     return -res

@@ -1,6 +1,5 @@
 from evolve import eval
 def bestmove(board,a,b,maxPlayer,maxdepth):
-    res=[]
     best_move=None
     def alphabeta(board,a,b,maxPlayer,depth):
         nonlocal  best_move
@@ -12,7 +11,7 @@ def bestmove(board,a,b,maxPlayer,maxdepth):
                 board1=board.copy()
                 board1.push(move)
                 score=alphabeta(board1,a,b,False,depth-1)
-                if score >v or best_move==None:
+                if score >v or best_move is None:
                     v=score
                     if depth==maxdepth:
                         print(["max",move,score])
@@ -28,7 +27,7 @@ def bestmove(board,a,b,maxPlayer,maxdepth):
                 board1.push(move)
                 score=alphabeta(board1,a,b,True,depth-1)
                 #v = min(v,score)
-                if v>score or best_move==None:
+                if v>score or best_move is None:
                     v=score
                     if depth==maxdepth:
                         print(["min",move,score])

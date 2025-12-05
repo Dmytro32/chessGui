@@ -1,18 +1,15 @@
 
-import chess.pgn
-import chess.pgn
-import chess.engine
-from tkinter import *
 from matplotlib.figure import Figure
-import numpy as np
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
-NavigationToolbar2Tk)
-#from tensorflow import keras
-from alphabeta import *
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from dialog import ChoicePopup
 from pieces import Pieces
 from move import Board
 from pvb import Bot
+import chess
+import chess.engine 
+import tkinter as tk
+
+HALF_IMAGE=8
 class Game():
     def __init__(self):
         self.board=Board()
@@ -46,7 +43,7 @@ class Game():
         obj=self.pieces[self.clicked]
         color=not obj.color()
         print(color)
-        if type(obj)==Pieces:
+        if type(obj) is Pieces:
             name="w"
         else:
             name="b"
@@ -85,8 +82,8 @@ class Game():
                     piece="rook2"
                     for j in self.pieces:
                         if  j.name==color+piece:
-                            self.canvas.moveto(i.obj,kpos[0]+moveOn[t][0],kpos[1]+8)
-                            self.canvas.moveto(j.obj,rpos[0]+moveOn[t][1],rpos[1]+8)
+                            self.canvas.moveto(i.obj,kpos[0]+moveOn[t][0],kpos[1]+HALF_IMAGE)
+                            self.canvas.moveto(j.obj,rpos[0]+moveOn[t][1],rpos[1]+HALF_IMAGE)
 
         elif board.is_queenside_castling(move):
             kpos=Board.move_to_cor('e',pos)
@@ -96,8 +93,8 @@ class Game():
                 if i.name==color+"king":
                     for j in self.pieces:
                         if  j.name==color+piece:
-                            self.canvas.moveto(i.obj,kpos[0]+moveOn[-t][0],kpos[1]+8)
-                            self.canvas.moveto(j.obj,rpos[0]+moveOn[-t][1],rpos[1]+8)
+                            self.canvas.moveto(i.obj,kpos[0]+moveOn[-t][0],kpos[1]+HALF_IMAGE)
+                            self.canvas.moveto(j.obj,rpos[0]+moveOn[-t][1],rpos[1]+HALF_IMAGE)
     
         print(self.board.get_board())
 
@@ -106,12 +103,12 @@ class Game():
  
         addX=30 
         addY=30 
-        l=[ppos[0]+addX,ppos[1]+addY]
-        print (l)
-        print("l:"+str(l))
+        pos=[ppos[0]+addX,ppos[1]+addY]
+        print (pos)
+        print("l:"+str(pos))
         for i in  enumerate(self.pieces):
             coords=self.canvas.coords(i[1].obj)
-            if coords[0]==l[0] and coords[1]==l[1]:
+            if coords[0]==pos[0] and coords[1]==pos[1]:
             # print("White")
                 self.canvas.delete(i[1].obj)
                 self.pieces.remove(i[1])
@@ -132,9 +129,9 @@ class Game():
             self.casting(move)
             board.push(chess.Move.from_uci(f"{pos1}{pos2}"))
             self.board.set_board(board)
-            info = self.engine.analyse(self.board.get_board(), chess.engine.Limit(time=0.1))
+            #info = self.engine.analyse(self.board.get_board(), chess.engine.Limit(time=0.1))
             return True
-        l=Board.move_to_cor(pos2[0],pos2[1])
+        cor=Board.move_to_cor(pos2[0],pos2[1])
         print(f"Before {self.clicked=}")
 
         if board.is_en_passant(move):
@@ -143,14 +140,14 @@ class Game():
             self.passant(fpos, ppos)
         else:
             for i in enumerate(self.pieces) :
-                if self.canvas.coords(i[1].obj)[0]-30==l[0] and self.canvas.coords(i[1].obj)[1]-30==l[1]:
+                if self.canvas.coords(i[1].obj)[0]-30==cor[0] and self.canvas.coords(i[1].obj)[1]-30==cor[1]:
                     if not self.pieces[self.clicked] == i[1].obj:
                         self.canvas.delete(i[1].obj)
                         self.pieces.remove(i[1])
                         print(f"Delete ind: {i[0]}")
                         self.correction(i[0])
         print(f"After {self.clicked=}")
-        self.canvas.moveto(self.pieces[self.clicked].obj,l[0]+8,l[1]+8)
+        self.canvas.moveto(self.pieces[self.clicked].obj,cor[0]+HALF_IMAGE,cor[1]+HALF_IMAGE)
         if prom:
              print(f"{self.pieces[self.clicked].name=},{self.pieces[self.clicked].obj=}")
              board.push(chess.Move.from_uci(f"{pos1}{pos2}{prom}"))
@@ -160,7 +157,7 @@ class Game():
        # print(self.board.get_board())
 
         self.board.set_board(board)
-        info = self.engine.analyse(self.board.get_board(), chess.engine.Limit(time=0.1))
+        #info = self.engine.analyse(self.board.get_board(), chess.engine.Limit(time=0.1))
        # self.draw(info)
     def select(self,event):
         if self.count ==0:
@@ -179,7 +176,7 @@ class Game():
            # print(f"{self.board.get_board().turn= }")
          #   print("second click")
             self.count=0
-            if  self.clicked==None:
+            if  self.clicked is None:
                 return False
         #    print (event.x,event.y)
             board=self.board.get_board()
@@ -187,7 +184,7 @@ class Game():
             y=self.canvas.coords(self.pieces[self.clicked].obj)[1]
             pos1=Board.cor_to_move(Pieces,x,y)
             pos2=Board.cor_to_move(Pieces,event.x,event.y)
-            if pos1==None or pos2==None or pos1==pos2:
+            if pos1 is None or pos2 is None or pos1==pos2:
                 print(f"same:{pos1}{pos2}")
                 return False
             if (pos1=="e1" and (pos2=="a1" or pos2=="h1")) or pos1=="e8" and (pos2=="a8"or pos2=="h8"):
@@ -221,7 +218,7 @@ class Game():
         else:
             s = f"{move} "
         self.display_text.set(s) 
-        self.Output.insert(END,s)
+        self.Output.insert(tk.END,s)
         #self.canvas.itemconfigure(self.moves,text=s)
 
         
@@ -263,7 +260,7 @@ class Game():
     def random_bot(self):
         res=Bot.random_bot(self.board.get_board(),self.board.get_turn())
         pos=Board.move_to_cor(res[1][0],res[1][1])
-        closet=self.canvas.find_closest(pos[0]+8,pos[1]+8)
+        closet=self.canvas.find_closest(pos[0]+HALF_IMAGE,pos[1]+HALF_IMAGE)
         for i in range(len(self.pieces)):
             if self.pieces[i].obj ==closet[0]:
                 self.clicked=i
@@ -289,26 +286,24 @@ class Game():
         self.run=root.after(3000,lambda:self.run_bot(root))
 
     def get_images(self):
-        wpawn= PhotoImage(file="D:/chess/chess-pack/chess-pawn.png")
-        bpawn= PhotoImage(file="D:/chess/chess-pack/chess-pawn (1).png")
-        wrook=PhotoImage(file="D:/chess/chess-pack/chess-rook.png")
-        brook=PhotoImage(file="D:/chess/chess-pack/chess-rook (1).png")
-        wbishop= PhotoImage(file="D:/chess/chess-pack/chess-bishop.png")
-        bbishop=PhotoImage(file="D:/chess/chess-pack/chess-bishop (1).png")
-        wknight= PhotoImage(file="D:/chess/chess-pack/chess-knight.png")
-        bknight= PhotoImage(file="D:/chess/chess-pack/chess-knight (1).png")
-        wqueen = PhotoImage(file="D:/chess/chess-pack/chess-queen.png")
-        bqueen= PhotoImage(file="D:/chess/chess-pack/chess-queen (1).png")
-        wking=PhotoImage(file="D:/chess/chess-pack/chess-king.png")
-        bking=PhotoImage(file="D:/chess/chess-pack/chess-king (1).png")
+        wpawn= tk.PhotoImage(file="D:/chess/chess-pack/chess-pawn.png")
+        bpawn= tk.PhotoImage(file="D:/chess/chess-pack/chess-pawn (1).png")
+        wrook=tk.PhotoImage(file="D:/chess/chess-pack/chess-rook.png")
+        brook=tk.PhotoImage(file="D:/chess/chess-pack/chess-rook (1).png")
+        wbishop= tk.PhotoImage(file="D:/chess/chess-pack/chess-bishop.png")
+        bbishop=tk.PhotoImage(file="D:/chess/chess-pack/chess-bishop (1).png")
+        wknight= tk.PhotoImage(file="D:/chess/chess-pack/chess-knight.png")
+        bknight= tk.PhotoImage(file="D:/chess/chess-pack/chess-knight (1).png")
+        wqueen = tk.PhotoImage(file="D:/chess/chess-pack/chess-queen.png")
+        bqueen= tk.PhotoImage(file="D:/chess/chess-pack/chess-queen (1).png")
+        wking=tk.PhotoImage(file="D:/chess/chess-pack/chess-king.png")
+        bking=tk.PhotoImage(file="D:/chess/chess-pack/chess-king (1).png")
         return wpawn,bpawn,wrook,brook,wknight,bknight,wbishop,bbishop,wqueen,bqueen,wking,bking
     def donothing():
-       x = 0
+       pass
     def draw(self,info):
-        try: 
-            self.pcanvas.get_tk_widget().destroy()
-        except:
-            pass
+        self.pcanvas.get_tk_widget().destroy()
+
         fig=Figure(figsize = (5, 5),dpi = 100)
         check= type(info["score"].relative)
         print(f"if Mate{check}")
@@ -316,11 +311,10 @@ class Game():
             self.y.append(info["score"].relative.score(mate_score=100000))
         else:
             self.y.append(info["score"].relative.score())
-        if  self.board.get_board().turn==False:
+        if  not self.board.get_board().turn:
             self.y[-1]=-self.y[-1]
         print(f"{self.y=}")
         plot1 = fig.add_subplot()
-        y=np.array(self.y)
         plot1.plot(self.y ,marker="o",mfc='k')
         self.pcanvas = FigureCanvasTkAgg(fig,master = self.frame2)  
        # self.pcanvas.draw()
@@ -336,11 +330,11 @@ class Game():
         if delet:
             self.root.destroy
 
-        self.root = Tk()
+        self.root = tk.Tk()
         self.root.title('Chess')
         #root.geometry('640x480')
-        menubar = Menu(self.root)
-        filemenu = Menu(menubar, tearoff=1)
+        menubar = tk.Menu(self.root)
+        filemenu = tk.Menu(menubar, tearoff=1)
         filemenu.add_command(label="PVP", command=lambda:self.game(True))
         filemenu.add_command(label="Open", command=self.donothing)
         filemenu.add_command(label="Save", command=self.donothing)
@@ -348,7 +342,7 @@ class Game():
         filemenu.add_command(label="Exit", command=self.root.quit)
         menubar.add_cascade(label="File", menu=filemenu)
 
-        helpmenu = Menu(menubar, tearoff=0)
+        helpmenu = tk.Menu(menubar, tearoff=0)
         helpmenu.add_command(label="random white", command=lambda:self.cheek_boot("White","random"))
         helpmenu.add_command(label="random black", command=lambda:self.cheek_boot("Black","random"))
         
@@ -361,22 +355,22 @@ class Game():
         menubar.add_cascade(label="Bot", menu=helpmenu)
 
         self.root.config(menu=menubar)
-        self.m = Menu(self.root, tearoff = 1)
+        self.m = tk.Menu(self.root, tearoff = 1)
         #self.keras_model = keras.models.load_model("D:\chess\chess-pack\weights.hdf5")
-        bg = PhotoImage(file ='D:/chess/chess-pack/board.png')
-        frame1=Frame(self.root)
+        bg = tk.PhotoImage(file ='D:/chess/chess-pack/board.png')
+        frame1=tk.Frame(self.root)
         frame1.pack(side="left")
-        self.frame2=Frame(self.root)
+        self.frame2=tk.Frame(self.root)
         self.frame2.pack(side="right")
-        self.canvas = Canvas(frame1, bg="black", bd=0, highlightthickness=0, width=480, height=480)
+        self.canvas = tk.Canvas(frame1, bg="black", bd=0, highlightthickness=0, width=480, height=480)
         #canvas_move = Canvas(frame2, bg="white", bd=0, highlightthickness=0, width=100, height=240)
         #Wself.canvas_stack = Canvas(root, bg="black", bd=0, highlightthickness=0, width=50, height=240)
         self.canvas.pack()
         #canvas_move.pack()
        # self.canvas_stack.pack()
-        self.Output = Text(self.frame2, height = 15,width = 40,bg = "light cyan")
+        self.Output = tk.Text(self.frame2, height = 15,width = 40,bg = "light cyan")
         self.Output.pack(side="top")
-        self.canvas.create_image(0,0,anchor=NW,image=bg)
+        self.canvas.create_image(0,0,anchor=tk.NW,image=bg)
         images= self.get_images()
         for i in range(8):
             self.pieces.append(Pieces(f"wpawn{i}",self.canvas.create_image(30+60*i,390,image=images[0])))
@@ -397,7 +391,7 @@ class Game():
         self.pieces.append(Pieces("bqueen",self.canvas.create_image(210,30,image=images[9])))
         self.pieces.append(Pieces("wking",self.canvas.create_image(270,450,image=images[10])))
         self.pieces.append(Pieces("bking",self.canvas.create_image(270,30,image=images[11])))
-        self.display_text = StringVar()
+        self.display_text = tk.StringVar()
        # self.moves=canvas_move.create_text(540, 0, text=self.display_text, fill="black", font=('Helvetica 10 bold'))
         #self.display = Label(self.canvas, textvariable=self.display_text)
         #self.display.place(height = 240, width = 60,anchor ="e")
